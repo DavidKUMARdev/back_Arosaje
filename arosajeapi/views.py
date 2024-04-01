@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 # arosajeapi/views.py
 from rest_framework import generics
+
 from rest_framework.permissions import IsAuthenticated
 from .models import *
 from .serializers import *
@@ -12,9 +13,16 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
 
-from django.contrib.auth.models import User
+
 from .serializers import RegisterSerializer
 from rest_framework import generics
+from copy import deepcopy
+
+from django.shortcuts import render
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from .models import CustomUser
+from .serializers import UserSerializer
 
 class CityListCreateView(generics.ListCreateAPIView):
     queryset = City.objects.all()
@@ -22,8 +30,9 @@ class CityListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
 class UserListCreateView(generics.ListCreateAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()  # Utilisez CustomUser.objects.all() au lieu de User.objects.all()
     permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
 
 class PlantListCreateView(generics.ListCreateAPIView):
     queryset = Plant.objects.all()
@@ -60,8 +69,9 @@ class OwnerListCreateView(generics.ListCreateAPIView):
     serializer_class = OwnerSerializer
     permission_classes = [IsAuthenticated]
 
+
 class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()  # Utilisez CustomUser à la place de User
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
 
@@ -71,4 +81,23 @@ class CurrentUserView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
-    
+
+
+class PlantCreateView(generics.CreateAPIView):
+    queryset = Plant.objects.all()
+    serializer_class = PlantSerializer
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        # Créez une copie mutable de request.data
+        mutable_data = deepcopy(request.data)
+
+        # Ajoutez l'utilisateur connecté comme propriétaire de la plante
+        mutable_data['owner'] = request.user.id
+
+        serializer = self.get_serializer(data=mutable_data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

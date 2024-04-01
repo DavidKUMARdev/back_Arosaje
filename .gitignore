@@ -2,3 +2,4 @@
 arosajeapi/migrations/__pycache__
 arosajeapi/__pycache__
 myenv/
+db.sqlite3

@@ -1,22 +1,23 @@
-# arosajeapi/models.py
+
+from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 
-class City(models.Model):
-    cityId = models.AutoField(primary_key=True)
-    cityName = models.CharField(max_length=255)
-
-class User(models.Model):
-    userId = models.AutoField(primary_key=True)
-    firstName = models.CharField(max_length=255)
-    lastName = models.CharField(max_length=255)
+class CustomUser(AbstractUser):
     age = models.IntegerField()
-    email = models.EmailField()
     phone = models.CharField(max_length=20)
     status = models.CharField(max_length=255)
     userAddress = models.CharField(max_length=255)
-    username = models.CharField(max_length=255)
-    password = models.CharField(max_length=255)
-    lives = models.ForeignKey(City, on_delete=models.CASCADE)
+
+    # Définissez les relations avec les groupes et les autorisations
+    groups = models.ManyToManyField(Group, verbose_name='groups', blank=True, related_name='customuser_set', related_query_name='user')
+    user_permissions = models.ManyToManyField(Permission, verbose_name='user permissions', blank=True, related_name='customuser_set', related_query_name='user')
+
+    class Meta:
+        # Spécifiez une table supplémentaire si nécessaire
+        db_table = 'custom_user'
+class City(models.Model):
+    cityId = models.AutoField(primary_key=True)
+    cityName = models.CharField(max_length=255)
 
 class Plant(models.Model):
     plantId = models.AutoField(primary_key=True)
@@ -24,7 +25,8 @@ class Plant(models.Model):
     plantDescription = models.TextField()
     name = models.CharField(max_length=255)
     plantAddress = models.CharField(max_length=255)
-    keepers = models.ManyToManyField(User, related_name='plants_kept')
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='owned_plants', null=True)
+    keepers = models.ManyToManyField(CustomUser, related_name='kept_plants', blank=True)
 
 class MessageHistory(models.Model):
     messageId = models.AutoField(primary_key=True)
@@ -38,14 +40,14 @@ class PlantImage(models.Model):
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE)
 
 class Botanist(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     provide_tips = models.ManyToManyField(Plant, related_name='botanist_tips')
 
 class Guardian(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     kept_plants = models.ManyToManyField(Plant, related_name='guardian_kept_plants')
     send_receive_messages = models.ManyToManyField(MessageHistory, related_name='guardian_messages')
 
 class Owner(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     send_receive_messages = models.ManyToManyField(MessageHistory, related_name='owner_messages')
