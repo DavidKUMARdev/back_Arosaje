@@ -60,10 +60,15 @@ class OwnerListCreateView(generics.ListCreateAPIView):
     serializer_class = OwnerSerializer
     permission_classes = [IsAuthenticated]
 
-
-
-
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
+
+class CurrentUserView(generics.RetrieveAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+    

@@ -12,6 +12,8 @@ urlpatterns = [
     path('guardians/', GuardianListCreateView.as_view(), name='guardian-list-create'),
     path('owners/', OwnerListCreateView.as_view(), name='owner-list-create'),
     path('register/', RegisterView.as_view(), name='auth_register'),
+    path('user/', CurrentUserView.as_view(), name='user-details'),
+
 
 
 ]
