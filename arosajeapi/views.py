@@ -30,14 +30,19 @@ class CityListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
 class UserListCreateView(generics.ListCreateAPIView):
-    queryset = CustomUser.objects.all()  # Utilisez CustomUser.objects.all() au lieu de User.objects.all()
+    queryset = CustomUser.objects.all()
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
 
 class PlantListCreateView(generics.ListCreateAPIView):
-    queryset = Plant.objects.all()
     serializer_class = PlantSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user_id = self.request.user.id
+        queryset = Plant.objects.filter(owner=user_id)
+        
+        return queryset
 
 class PlantRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Plant.objects.all()
@@ -71,7 +76,7 @@ class OwnerListCreateView(generics.ListCreateAPIView):
 
 
 class RegisterView(generics.CreateAPIView):
-    queryset = CustomUser.objects.all()  # Utilisez CustomUser à la place de User
+    queryset = CustomUser.objects.all() 
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
 
@@ -89,10 +94,7 @@ class PlantCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        # Créez une copie mutable de request.data
         mutable_data = deepcopy(request.data)
-
-        # Ajoutez l'utilisateur connecté comme propriétaire de la plante
         mutable_data['owner'] = request.user.id
 
         serializer = self.get_serializer(data=mutable_data)
