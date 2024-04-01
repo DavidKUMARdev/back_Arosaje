@@ -3,11 +3,6 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 
 class CustomUser(AbstractUser):
-    age = models.IntegerField()
-    phone = models.CharField(max_length=20)
-    status = models.CharField(max_length=255)
-    userAddress = models.CharField(max_length=255)
-
     # Définissez les relations avec les groupes et les autorisations
     groups = models.ManyToManyField(Group, verbose_name='groups', blank=True, related_name='customuser_set', related_query_name='user')
     user_permissions = models.ManyToManyField(Permission, verbose_name='user permissions', blank=True, related_name='customuser_set', related_query_name='user')
@@ -15,6 +10,7 @@ class CustomUser(AbstractUser):
     class Meta:
         # Spécifiez une table supplémentaire si nécessaire
         db_table = 'custom_user'
+
 class City(models.Model):
     cityId = models.AutoField(primary_key=True)
     cityName = models.CharField(max_length=255)

@@ -19,15 +19,10 @@ class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)
 
-    # Ajoutez les champs supplémentaires de CustomUser
-    age = serializers.IntegerField(required=True)
-    phone = serializers.CharField(max_length=20, required=True)
-    status = serializers.CharField(max_length=255, required=True)
-    userAddress = serializers.CharField(max_length=255, required=True)
 
     class Meta:
         model = CustomUser
-        fields = ('username', 'password', 'password2', 'email', 'first_name', 'last_name', 'age', 'phone', 'status', 'userAddress')
+        fields = ('username', 'password', 'password2', 'email', 'first_name', 'last_name')
         extra_kwargs = {
             'first_name': {'required': True},
             'last_name': {'required': True}
@@ -45,10 +40,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
-            age=validated_data['age'],  # Assurez-vous d'inclure les champs supplémentaires lors de la création de l'utilisateur
-            phone=validated_data['phone'],
-            status=validated_data['status'],
-            userAddress=validated_data['userAddress']
+            
         )
 
         user.set_password(validated_data['password'])
