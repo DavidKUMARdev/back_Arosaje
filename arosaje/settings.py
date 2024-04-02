@@ -62,11 +62,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'arosaje.urls'
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    # Ajoutez d'autres origines autorisées ici au besoin
-]
+CORS_ALLOW_ALL_ORIGINS = True
+#CORS_ALLOWED_ORIGINS = ['*']
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

@@ -2,27 +2,17 @@ from django.shortcuts import render
 
 # arosajeapi/views.py
 from rest_framework import generics
-
 from rest_framework.permissions import IsAuthenticated
 from .models import *
 from .serializers import *
-
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
-
-
-from .serializers import RegisterSerializer
-from rest_framework import generics
 from copy import deepcopy
-
 from django.shortcuts import render
-from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from .models import CustomUser
-from .serializers import UserSerializer
 
 class CityListCreateView(generics.ListCreateAPIView):
     queryset = City.objects.all()
